@@ -12,5 +12,7 @@ class Beacon {
     val uuid: String? = null
     val major: Int? = -1
     val minor: Int? = -1
+    val latitude: Double? = .0
+    val longitude: Double? = .0
 
 }

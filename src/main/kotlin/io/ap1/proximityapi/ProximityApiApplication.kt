@@ -8,4 +8,7 @@ class ProximityApiApplication
 
 fun main(args: Array<String>) {
     SpringApplication.run(ProximityApiApplication::class.java, *args)
+
+
+
 }

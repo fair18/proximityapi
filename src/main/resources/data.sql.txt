@@ -1,0 +1,17 @@
+INSERT INTO beacons (name, uuid, major, minor, lat, lng)
+VALUES ('Behemoth', '23a01af0-232a-4518-9c0e-323fb773f5ef', 1, 2, 43.6669815, -79.3852928);
+//INSERT INTO beacons (name, uuid, major, minor) VALUES ('Flight Deck', '23a01af0-232a-4518-9c0e-323fb773f5ef', 1131, 4132);
+//INSERT INTO beacons (name, uuid, major, minor) VALUES ('WindSeeker', '23a01af0-232a-4518-9c0e-323fb773f5ef', 54872, 469);
+//INSERT INTO beacons (name, uuid, major, minor) VALUES ('Park Entrance', '23a01af0-232a-4518-9c0e-323fb773f5ef', 54253, 64005);
+//INSERT INTO beacons (name, uuid, major, minor) VALUES ('Vortex', '23A01AF0-232A-4518-9C0E-323FB773F5EF', 100, 5);
+
+INSERT INTO geofences (name, lat, lng)
+VALUES ('MUSIC GARDEN', 43.6669815, -79.3852928);
+INSERT INTO geofences (name, geopath, lat, lng)
+VALUES ('ROGERS CENTER', 'myjiGf`qcNbHgBf@cJeE_G}GxCOhI', 43.6669815, -79.3852928);
+INSERT INTO geofences (name, geopath, lat, lng)
+VALUES ('CP CANOE LANDING', '{hjiGvlrcN`GwBy@mGkAqC}E`Bp@`G', 43.6669815, -79.3852928);
+INSERT INTO geofences (name, geopath, lat, lng)
+VALUES ('HARBOUR FRONT CENTER', 'sijiG`ipcNxJqCuBgk@gPbH', 43.6669815, -79.3852928);
+INSERT INTO geofences (name, geopath, lat, lng)
+VALUES ('TRINITY BELLWOODS', '{iliGpjvcNf^iKoEa]o]rK', 43.6669815, -79.3852928);

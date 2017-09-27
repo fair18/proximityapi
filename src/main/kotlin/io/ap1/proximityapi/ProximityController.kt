@@ -1,40 +1,75 @@
 package io.ap1.proximityapi
 
-import io.ap1.proximityapi.entities.Event
-import io.ap1.proximityapi.repositories.BeaconRepository
-import io.ap1.proximityapi.repositories.EventRepository
-import io.ap1.proximityapi.repositories.GeofenceRepository
+import io.ap1.proximityapi.model.Event
+import io.ap1.proximityapi.model.Subscriber
+import io.ap1.proximityapi.model.Zones
+import io.ap1.proximityapi.repository.BeaconRepository
+import io.ap1.proximityapi.repository.EventRepository
+import io.ap1.proximityapi.repository.GeofenceRepository
+import io.ap1.proximityapi.repository.SubscriberRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.lang.IllegalStateException
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
+
 
 @RestController
-@RequestMapping(produces = arrayOf(APPLICATION_JSON_UTF8_VALUE))
+@RequestMapping("/api")
 class ProximityController {
 
-    @Value("\${api.key}")
-    val apiKey: String? = null
+    @Autowired
+    lateinit var beaconRepo: BeaconRepository
 
     @Autowired
-    lateinit var eventRepository: EventRepository
+    lateinit var geofenceRepo: GeofenceRepository
+
     @Autowired
-    lateinit var beaconRepository: BeaconRepository
+    lateinit var subscriberRepo: SubscriberRepository
+
     @Autowired
-    lateinit var geofenceRepository: GeofenceRepository
+    lateinit var eventRepo: EventRepository
+
+    @Autowired
+    lateinit var notificationService: NotificationService
 
     @GetMapping("/zones")
-    fun getZones(@RequestHeader("Api-Key") key: String,
-                 @RequestParam("lat") latitude: Double,
-                 @RequestParam("lng") longitude: Double): ZonesResponse? {
-        return ZonesResponse(beaconRepository.findAll(), geofenceRepository.findAll())
+    fun getZones(@RequestHeader("Authorization") header: String,
+                 @RequestParam("lat") lat: Double,
+                 @RequestParam("lng") lng: Double): ResponseEntity<ZonesResponse> {
+        val zones = Zones(beaconRepo.findAll(), geofenceRepo.findAll())
+        return ResponseEntity.ok(ZonesResponse(zones))
     }
-
 
     @PostMapping("/event")
-    fun enter(@RequestHeader("Api-Key") key: String, @RequestBody event: Event): Long {
-        if (!apiKey?.contentEquals(key)!!) throw IllegalStateException("api-key is not valid")
-        return eventRepository.save(event).eid
+    fun postEvent(@RequestHeader("Authorization") header: String,
+                  @RequestBody event: Event): ResponseEntity<Void> {
+        val savedEvent = eventRepo.save(event)
+        return when (savedEvent) {
+            null -> ResponseEntity(HttpStatus.BAD_REQUEST)
+            else -> {
+                if (savedEvent.event!!.contentEquals("enter")) {
+                    println("send push notification")
+                    val push = notificationService.pushNotification(savedEvent.deviceId!!)
+                    CompletableFuture.allOf(push)
+                    try {
+                        val response = push?.get()
+                        response?.let { println("Firebase pushed successfully") }
+                    } catch (ex: ExecutionException) {
+                        ex.printStackTrace()
+                    }
+                }
+                return ResponseEntity(HttpStatus.NO_CONTENT)
+            }
+        }
     }
+
+    @PostMapping("/subscriber")
+    fun postSubscriber(@RequestHeader("Authorization") header: String,
+                       @RequestBody subscriber: Subscriber): ResponseEntity<Void> {
+        return if (subscriberRepo.save(subscriber) == null) ResponseEntity(HttpStatus.BAD_REQUEST)
+        else ResponseEntity(HttpStatus.NO_CONTENT)
+    }
+
 }

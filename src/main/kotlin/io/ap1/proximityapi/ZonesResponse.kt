@@ -1,6 +1,5 @@
 package io.ap1.proximityapi
 
-import io.ap1.proximityapi.entities.Beacon
-import io.ap1.proximityapi.entities.Geofence
+import io.ap1.proximityapi.model.Zones
 
-class ZonesResponse(val beacons: MutableList<Beacon>, val geofences: MutableList<Geofence>)
+data class ZonesResponse(val zones: Zones)

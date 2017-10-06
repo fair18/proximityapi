@@ -3,10 +3,7 @@ package io.ap1.proximityapi
 import io.ap1.proximityapi.model.Event
 import io.ap1.proximityapi.model.Subscriber
 import io.ap1.proximityapi.model.Zones
-import io.ap1.proximityapi.repository.BeaconRepository
-import io.ap1.proximityapi.repository.EventRepository
-import io.ap1.proximityapi.repository.GeofenceRepository
-import io.ap1.proximityapi.repository.SubscriberRepository
+import io.ap1.proximityapi.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,6 +23,9 @@ class ProximityController {
     lateinit var geofenceRepo: GeofenceRepository
 
     @Autowired
+    lateinit var networkRepo: NetworkRepository
+
+    @Autowired
     lateinit var subscriberRepo: SubscriberRepository
 
     @Autowired
@@ -38,7 +38,7 @@ class ProximityController {
     fun getZones(@RequestHeader("Authorization") header: String,
                  @RequestParam("lat") lat: Double,
                  @RequestParam("lng") lng: Double): ResponseEntity<ZonesResponse> {
-        val zones = Zones(beaconRepo.findAll(), geofenceRepo.findAll())
+        val zones = Zones(beaconRepo.findAll(), geofenceRepo.findAll(), networkRepo.findAll())
         return ResponseEntity.ok(ZonesResponse(zones))
     }
 

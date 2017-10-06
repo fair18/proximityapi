@@ -2,9 +2,11 @@ package io.ap1.proximityapi
 
 import io.ap1.proximityapi.model.Beacon
 import io.ap1.proximityapi.model.Geofence
+import io.ap1.proximityapi.model.Network
 import io.ap1.proximityapi.model.Zones
 import io.ap1.proximityapi.repository.BeaconRepository
 import io.ap1.proximityapi.repository.GeofenceRepository
+import io.ap1.proximityapi.repository.NetworkRepository
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -24,6 +26,8 @@ class BeaconRepositoryTest {
     private lateinit var beaconRepository: BeaconRepository
     @Autowired
     private lateinit var geofenceRepository: GeofenceRepository
+    @Autowired
+    private lateinit var networkRepository: NetworkRepository
 
     @Before
     @Throws(Exception::class)
@@ -56,12 +60,32 @@ class BeaconRepositoryTest {
         Assert.assertNull(geofence.id)
         geofenceRepository.save(geofence)
         Assert.assertNotNull(geofence.id)
+
+        networkRepository.deleteAll()
+        val network = Network()
+        network.networkId = mongo.getNextSequence<AutoIncrementCounter>("networks")
+        network.name = "AP1"
+        network.ssid = "Ap1 Network"
+
+        Assert.assertNull(network.id)
+        networkRepository.save(network)
+        Assert.assertNotNull(network.id)
+
+        val network1 = Network()
+        network1.networkId = mongo.getNextSequence<AutoIncrementCounter>("networks")
+        network1.name = "OWENERGY"
+        network1.ssid = "OWENERGY-Guest"
+
+        Assert.assertNull(network1.id)
+        networkRepository.save(network1)
+        Assert.assertNotNull(network1.id)
+
     }
 
     @Test
     fun fetchZones() {
 
-        val zones = ZonesResponse(Zones(beaconRepository.findAll(), geofenceRepository.findAll()))
+        val zones = ZonesResponse(Zones(beaconRepository.findAll(), geofenceRepository.findAll(), networkRepository.findAll()))
         print(zones)
 
     }

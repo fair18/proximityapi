@@ -34,12 +34,19 @@ class ProximityController {
     @Autowired
     lateinit var notificationService: NotificationService
 
-    @GetMapping("/zones")
+    @GetMapping("/{type}/zones")
     fun getZones(@RequestHeader("Authorization") header: String,
+                 @PathVariable("type") type: String,
                  @RequestParam("lat") lat: Double,
                  @RequestParam("lng") lng: Double): ResponseEntity<ZonesResponse> {
-        val zones = Zones(beaconRepo.findAll(), geofenceRepo.findAll(), networkRepo.findAll())
-        return ResponseEntity.ok(ZonesResponse(zones))
+        val results = when (type) {
+            "beacon" -> Zones(beaconRepo.findAll(), null, null)
+            "geofence" -> Zones(null, geofenceRepo.findAll(), null)
+            "network" -> Zones(null, null, networkRepo.findAll())
+            else -> null
+        }
+        return if (results == null) ResponseEntity.badRequest().build()
+        else ResponseEntity.ok(ZonesResponse(results))
     }
 
     @PostMapping("/event")

@@ -65,7 +65,7 @@ class BeaconRepositoryTest {
         val network = Network()
         network.networkId = mongo.getNextSequence<AutoIncrementCounter>("networks")
         network.name = "AP1"
-        network.ssid = "Ap1 Network"
+        network.ssid = "Sweet Network"
 
         Assert.assertNull(network.id)
         networkRepository.save(network)
